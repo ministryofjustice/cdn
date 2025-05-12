@@ -37,6 +37,7 @@ mkdir --parents "tmp/${FRONTEND}/${FRONTEND_VERSION}"
 # Download artifact
 gh release download \
   --repo "${REPOSITORY}" \
+  "${FRONTEND_VERSION}" \
   --pattern "${RELEASE_PREFIX}-${FRONTEND_VERSION}.zip" \
   --dir "tmp/${FRONTEND}/${FRONTEND_VERSION}" \
   --clobber
