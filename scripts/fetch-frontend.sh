@@ -7,18 +7,18 @@ FRONTEND_VERSION="${2}"
 
 # Check if FRONTEND is valid
 case "${FRONTEND}" in
-  "govuk-frontend")
-    REPOSITORY="alphagov/govuk-frontend"
-    RELEASE_PREFIX="release"
+"govuk-frontend")
+  REPOSITORY="alphagov/govuk-frontend"
+  RELEASE_PREFIX="release"
   ;;
-  "moj-frontend")
-    REPOSITORY="ministryofjustice/moj-frontend"
-    RELEASE_PREFIX="release"
+"moj-frontend")
+  REPOSITORY="ministryofjustice/moj-frontend"
+  RELEASE_PREFIX="release"
   ;;
-  *)
-    echo "Unknown frontend: ${FRONTEND}"
-    echo "Valid options are: govuk-frontend, moj-frontend"
-    exit 1
+*)
+  echo "Unknown frontend: ${FRONTEND}"
+  echo "Valid options are: govuk-frontend, moj-frontend"
+  exit 1
   ;;
 esac
 
