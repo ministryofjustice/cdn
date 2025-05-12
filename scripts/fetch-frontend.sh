@@ -26,6 +26,7 @@ esac
 if [[ "$(gh release list --repo "${REPOSITORY}" --exclude-pre-releases --json tagName | jq -r --arg tag "${FRONTEND_VERSION}" '.[].tagName | select(. == $tag)')" != "${FRONTEND_VERSION}" ]]; then
   echo "Invalid version: ${FRONTEND_VERSION}"
   echo "Please check available versions on GitHub: https://github.com/${REPOSITORY}/releases"
+  echo "or use the command: gh release list --repo ${REPOSITORY} --exclude-pre-releases"
   exit 1
 fi
 
