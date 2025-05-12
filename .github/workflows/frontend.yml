@@ -20,16 +20,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        frontend:
-          - govuk-frontend
-          - moj-frontend
+        frontend: [govuk-frontend, moj-frontend]
         include:
-          # govuk-frontend
           - frontend: govuk-frontend
             version: v5.9.0
           - frontend: govuk-frontend
             version: v5.10.0
-          # moj-frontend
           - frontend: moj-frontend
             version: v5.1.2
           - frontend: moj-frontend
