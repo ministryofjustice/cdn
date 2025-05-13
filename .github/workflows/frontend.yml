@@ -41,11 +41,10 @@ jobs:
   frontend-test:
     if: github.ref != 'refs/heads/main'
     needs: generate-matrix
-    name: Frontend
+    name: Frontend Test
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -57,13 +56,36 @@ jobs:
         with:
           persist-credentials: false
 
-      # - name: Configure AWS Credentials
-      #   if: github.ref == 'refs/heads/main'
-      #   id: configure_aws_credentials
-      #   uses: aws-actions/configure-aws-credentials@f24d7193d98baebaeacc7e2227925dd47cc267f5 # v4.2.0
-      #   with:
-      #     aws-region: eu-west-2
-      #     role-to-assume: ${{ secrets.IAM_ROLE }}
+      - name: Fetch Frontend
+        id: fetch_frontend
+        env:
+          FRONTEND: ${{ matrix.frontend }}
+          FRONTEND_VERSION: ${{ matrix.version }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bash scripts/fetch-frontend.sh "${FRONTEND}" "${FRONTEND_VERSION}"
+
+  frontend-deploy:
+    # if: github.ref == 'refs/heads/main'
+    needs: generate-matrix
+    name: Frontend Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: production
+      url: ${{ env.CLOUDFRONT_URL }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
 
       - name: Fetch Frontend
         id: fetch_frontend
@@ -74,12 +96,18 @@ jobs:
         run: |
           bash scripts/fetch-frontend.sh "${FRONTEND}" "${FRONTEND_VERSION}"
 
-      # - name: Deploy Frontend
-      #   if: github.ref == 'refs/heads/main'
-      #   id: deploy_frontend
-      #   env:
-      #     FRONTEND: ${{ matrix.frontend }}
-      #     FRONTEND_VERSION: ${{ matrix.version }}
-      #     S3_BUCKET: ${{ secrets.S3_BUCKET }}
-      #   run: |
-      #     aws s3 sync "dist/${FRONTEND}/${FRONTEND_VERSION}" "s3://${S3_BUCKET}/${FRONTEND}/${FRONTEND_VERSION}" --delete
+      - name: Configure AWS Credentials
+        id: configure_aws_credentials
+        uses: aws-actions/configure-aws-credentials@f24d7193d98baebaeacc7e2227925dd47cc267f5 # v4.2.0
+        with:
+          aws-region: eu-west-2
+          role-to-assume: ${{ secrets.IAM_ROLE }}
+
+      - name: Deploy Frontend
+        id: deploy_frontend
+        env:
+          FRONTEND: ${{ matrix.frontend }}
+          FRONTEND_VERSION: ${{ matrix.version }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: |
+          aws s3 sync "dist/${FRONTEND}/${FRONTEND_VERSION}" "s3://${S3_BUCKET}/${FRONTEND}/${FRONTEND_VERSION}" --delete
