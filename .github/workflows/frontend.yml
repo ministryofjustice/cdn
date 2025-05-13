@@ -75,7 +75,7 @@ jobs:
       id-token: write
     environment:
       name: production
-      url: ${{ env.CLOUDFRONT_URL }}
+      url: ${{ steps.get_cloudfront_url.outputs.cloudfront-url }}
     strategy:
       fail-fast: false
       matrix:
@@ -86,6 +86,13 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
+
+      - name: Get CloudFront URL
+        id: get_cloudfront_url
+        env:
+          CLOUDFRONT_URL: ${{ env.CLOUDFRONT_URL }}
+        run: |
+          echo "cloudfront-url=${CLOUDFRONT_URL}" >>"${GITHUB_OUTPUT}"
 
       - name: Fetch Frontend
         id: fetch_frontend
