@@ -35,7 +35,7 @@ jobs:
       - name: Generate Matrix
         id: generate_matrix
         run: |
-          export MATRIX=$(cat config/frontend.json)
+          export MATRIX=$(jq -c . < ./config/frontend.json)
           echo "matrix=${MATRIX}" >>"${GITHUB_OUTPUT}"
 
   frontend-test:
